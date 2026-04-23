@@ -3,6 +3,7 @@ package com.realtimepricetracker.presentation.ui
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +17,7 @@ import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,6 +27,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -68,8 +71,33 @@ fun PriceTrackerScreenContent(
     uiState: PriceTrackerUiState,
     modifier: Modifier = Modifier,
 ) {
-    LazyColumn(modifier = modifier.fillMaxSize()) {
-        items(uiState.stocks, key = { it.symbol }) { stock ->
+    Box(modifier = modifier
+        .fillMaxSize()
+        .padding(16.dp), contentAlignment = Alignment.Center) {
+        when {
+            uiState.loading && uiState.stocks.isEmpty() -> {
+                CircularProgressIndicator()
+            }
+
+            uiState.error != null -> {
+                Text(text = "Error: ${uiState.error}", color = ErrorRed)
+            }
+
+            uiState.stocks.isEmpty() -> {
+                Text(text = "No data available", color = Color.Gray)
+            }
+
+            else -> {
+                PriceList(stocks = uiState.stocks)
+            }
+        }
+    }
+}
+
+@Composable
+private fun PriceList(stocks: List<StockUiModel>) {
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        items(stocks, key = { it.symbol }) { stock ->
             StockRow(stock = stock)
         }
     }

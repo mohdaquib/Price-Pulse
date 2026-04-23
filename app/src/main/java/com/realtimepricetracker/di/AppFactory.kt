@@ -1,6 +1,7 @@
 package com.realtimepricetracker.di
 
 import com.google.gson.Gson
+import com.realtimepricetracker.data.datasource.FinnhubRestDataSource
 import com.realtimepricetracker.data.datasource.WebSocketDataSource
 import com.realtimepricetracker.data.repositories.ConnectionRepositoryImpl
 import com.realtimepricetracker.data.repositories.PriceRepositoryImpl
@@ -8,8 +9,8 @@ import com.realtimepricetracker.domain.repositories.ConnectionRepository
 import com.realtimepricetracker.domain.repositories.PriceRepository
 import com.realtimepricetracker.domain.usecases.GetInitialStocksUseCase
 import com.realtimepricetracker.domain.usecases.ManageConnectionUseCase
-import com.realtimepricetracker.domain.usecases.SendPriceUpdateUseCase
 import com.realtimepricetracker.domain.usecases.SubscribeToPriceUpdatesUseCase
+import com.realtimepricetracker.domain.usecases.WatchSymbolsUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 
@@ -20,6 +21,7 @@ import kotlinx.coroutines.SupervisorJob
 object AppFactory {
     private val appScope = CoroutineScope(SupervisorJob())
     private val gson = Gson()
+    private val restDataSource = FinnhubRestDataSource(gson = gson)
 
     // Data sources
     private val webSocketDataSource by lazy {
@@ -28,7 +30,7 @@ object AppFactory {
 
     // Repositories
     val priceRepository: PriceRepository by lazy {
-        PriceRepositoryImpl(webSocketDataSource, gson)
+        PriceRepositoryImpl(webSocketDataSource, restDataSource = restDataSource, gson = gson)
     }
 
     val connectionRepository: ConnectionRepository by lazy {
@@ -44,12 +46,11 @@ object AppFactory {
         SubscribeToPriceUpdatesUseCase(priceRepository)
     }
 
-    val sendPriceUpdateUseCase by lazy {
-        SendPriceUpdateUseCase(priceRepository)
+    val watchSymbolsUseCase by lazy {
+        WatchSymbolsUseCase(priceRepository)
     }
 
     val manageConnectionUseCase by lazy {
         ManageConnectionUseCase(connectionRepository)
     }
 }
-

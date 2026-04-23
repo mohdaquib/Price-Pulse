@@ -2,7 +2,6 @@ package com.realtimepricetracker.data.datasource
 
 import com.realtimepricetracker.data.config.DataConstants
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -29,6 +28,8 @@ class WebSocketDataSource(private val scope: CoroutineScope) {
     val receivedMessages: SharedFlow<String> = _receivedMessages
 
     fun connect() {
+        if (_connectionState.value) return
+        
         val request = Request.Builder().url(DataConstants.WS_URL).build()
         webSocket = client.newWebSocket(request, object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {
@@ -49,15 +50,33 @@ class WebSocketDataSource(private val scope: CoroutineScope) {
         })
     }
 
-    fun send(message: String) {
+    fun subscribe(symbol: String) {
+        val message = String.format(DataConstants.SUBSCRIBE_MESSAGE, symbol)
+        send(message)
+    }
+
+    fun unsubscribe(symbol: String) {
+        val message = String.format(DataConstants.UNSUBSCRIBE_MESSAGE, symbol)
+        send(message)
+    }
+
+    fun subscribeMultiple(symbols: List<String>) {
+        symbols.forEach { subscribe(it) }
+    }
+
+    fun unsubscribeMultiple(symbols: List<String>) {
+        symbols.forEach { unsubscribe(it) }
+    }
+
+    private fun send(message: String) {
         webSocket?.send(message)
     }
 
     fun disconnect() {
         webSocket?.close(1000, "App closed")
         _connectionState.value = false
+        webSocket = null
     }
 
     fun isConnected(): Boolean = _connectionState.value
 }
-

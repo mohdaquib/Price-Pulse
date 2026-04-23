@@ -1,35 +1,52 @@
 package com.realtimepricetracker.data.repositories
 
+import com.realtimepricetracker.data.datasource.FinnhubRestDataSource
 import com.realtimepricetracker.data.datasource.WebSocketDataSource
-import com.realtimepricetracker.data.dto.PriceUpdateDto
-import com.realtimepricetracker.data.dto.toDto
-import com.realtimepricetracker.domain.config.DomainConstants
+import com.realtimepricetracker.data.dto.FinnhubTradeDto
 import com.realtimepricetracker.domain.entities.Stock
 import com.realtimepricetracker.domain.repositories.PriceRepository
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlin.random.Random
+import kotlinx.coroutines.flow.filterNotNull
 
 /**
- * Implementation of PriceRepository using WebSocket data source.
+ * Implementation of PriceRepository using Finnhub API.
+ * Uses REST API for initial data and WebSocket for real-time updates.
  */
 class PriceRepositoryImpl(
     private val webSocketDataSource: WebSocketDataSource,
+    private val restDataSource: FinnhubRestDataSource,
     private val gson: Gson
 ) : PriceRepository {
 
+    // Cache for previous prices to calculate changes
+    private val priceCache = mutableMapOf<String, Double>()
+
     override suspend fun getStocks(symbols: List<String>): Result<List<Stock>> {
         return try {
-            val stocks = symbols.map { symbol ->
-                Stock(
-                    symbol = symbol,
-                    price = 100.0 + Random.nextDouble(0.0, 200.0),
-                    change = 0.0,
-                    changePercentage = 0.0
-                )
-            }
-            Result.success(stocks.sortedByDescending { it.price })
+            val quotesResult = restDataSource.getQuotes(symbols)
+
+            quotesResult.fold(
+                onSuccess = { quotes ->
+                    val stocks = quotes.map { (symbol, quoteDto) ->
+                        val stock = Stock(
+                            symbol = symbol,
+                            price = quoteDto.currentPrice,
+                            change = quoteDto.change,
+                            changePercentage = quoteDto.percentChange
+                        )
+                        // Cache the initial price for change calculations
+                        priceCache[symbol] = quoteDto.currentPrice
+                        stock
+                    }.sortedByDescending { it.price }
+
+                    Result.success(stocks)
+                },
+                onFailure = { error ->
+                    Result.failure(error)
+                }
+            )
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -38,24 +55,51 @@ class PriceRepositoryImpl(
     override fun subscribeToPriceUpdates(): Flow<Result<Stock>> {
         return webSocketDataSource.receivedMessages.map { message ->
             try {
-                val dto = gson.fromJson(message, PriceUpdateDto::class.java)
-                Result.success(dto.toDomain())
+                val tradeDto = gson.fromJson(message, FinnhubTradeDto::class.java)
+                if (tradeDto.type == "trade" && tradeDto.data.isNotEmpty()) {
+                    val trade = tradeDto.data.first()
+                    val previousPrice = priceCache[trade.symbol] ?: trade.price
+                    val change = trade.price - previousPrice
+
+                    // Update cache
+                    priceCache[trade.symbol] = trade.price
+
+                    val stock = Stock(
+                        symbol = trade.symbol,
+                        price = trade.price,
+                        change = change,
+                        changePercentage = if (previousPrice != 0.0) (change / previousPrice) * 100 else 0.0
+                    )
+                    Result.success(stock)
+                } else {
+                    null // Ignore non-trade messages
+                }
             } catch (e: Exception) {
-                Result.failure(e)
+                Result.failure<Stock>(Exception("Failed to parse WebSocket message: ${e.message}"))
             }
-        }
+        }.filterNotNull()
     }
 
-    override suspend fun sendPriceUpdate(stock: Stock): Result<Unit> {
+    override suspend fun subscribeToSymbols(symbols: List<String>): Result<Unit> {
         return try {
-            val dto = stock.toDto()
-            val json = gson.toJson(dto)
-            webSocketDataSource.send(json)
+            webSocketDataSource.subscribeMultiple(symbols)
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
+
+    override suspend fun unsubscribeFromSymbols(symbols: List<String>): Result<Unit> {
+        return try {
+            webSocketDataSource.unsubscribeMultiple(symbols)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun sendPriceUpdate(stock: Stock): Result<Unit> {
+        // For real API, we don't send updates, we just receive them
+        return Result.success(Unit)
+    }
 }
-
-

@@ -19,8 +19,17 @@ interface PriceRepository {
     fun subscribeToPriceUpdates(): Flow<Result<Stock>>
 
     /**
-     * Send a price update through the network
+     * Start watching specific symbols for real-time updates
+     */
+    suspend fun subscribeToSymbols(symbols: List<String>): Result<Unit>
+
+    /**
+     * Stop watching specific symbols
+     */
+    suspend fun unsubscribeFromSymbols(symbols: List<String>): Result<Unit>
+
+    /**
+     * Send a price update through the network (for mock/testing)
      */
     suspend fun sendPriceUpdate(stock: Stock): Result<Unit>
 }
-

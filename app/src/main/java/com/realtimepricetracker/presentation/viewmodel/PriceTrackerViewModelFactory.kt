@@ -14,7 +14,7 @@ class PriceTrackerViewModelFactory : ViewModelProvider.Factory {
             return PriceTrackerViewModel(
                 getInitialStocksUseCase = AppFactory.getInitialStocksUseCase,
                 subscribeToPriceUpdatesUseCase = AppFactory.subscribeToPriceUpdatesUseCase,
-                sendPriceUpdateUseCase = AppFactory.sendPriceUpdateUseCase,
+                watchSymbolsUseCase = AppFactory.watchSymbolsUseCase,
                 manageConnectionUseCase = AppFactory.manageConnectionUseCase
             ) as T
         }
