@@ -3,11 +3,14 @@ package com.realtimepricetracker.data.repositories
 import com.realtimepricetracker.data.datasource.WebSocketDataSource
 import com.realtimepricetracker.domain.repositories.ConnectionRepository
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Implementation of ConnectionRepository using WebSocket data source.
  */
-class ConnectionRepositoryImpl(
+@Singleton
+class ConnectionRepositoryImpl @Inject constructor(
     private val webSocketDataSource: WebSocketDataSource
 ) : ConnectionRepository {
 
@@ -37,4 +40,3 @@ class ConnectionRepositoryImpl(
         return webSocketDataSource.isConnected()
     }
 }
-

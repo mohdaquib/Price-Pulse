@@ -26,10 +26,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.realtimepricetracker.domain.entities.AlertCondition
-import com.realtimepricetracker.ui.theme.AccentGold
-import com.realtimepricetracker.ui.theme.BullGreen
-import com.realtimepricetracker.ui.theme.BearRed
-import com.realtimepricetracker.ui.theme.RealtimePriceTrackerTheme
+import com.realtimepricetracker.presentation.ui.theme.AccentGold
+import com.realtimepricetracker.presentation.ui.theme.BullGreen
+import com.realtimepricetracker.presentation.ui.theme.BearRed
+import com.realtimepricetracker.presentation.ui.theme.RealtimePriceTrackerTheme
 
 @Composable
 fun SetAlertDialog(

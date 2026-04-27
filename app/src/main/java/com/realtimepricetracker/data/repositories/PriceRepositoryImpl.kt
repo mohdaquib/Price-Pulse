@@ -10,8 +10,11 @@ import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.filterNotNull
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class PriceRepositoryImpl(
+@Singleton
+class PriceRepositoryImpl @Inject constructor(
     private val webSocketDataSource: WebSocketDataSource,
     private val restDataSource: FinnhubRestDataSource,
     private val gson: Gson,

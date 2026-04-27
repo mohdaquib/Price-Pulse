@@ -24,6 +24,7 @@ import com.realtimepricetracker.domain.usecases.WatchSymbolsUseCase
 import com.realtimepricetracker.presentation.state.AppTab
 import com.realtimepricetracker.presentation.state.PriceTrackerUiState
 import com.realtimepricetracker.presentation.state.StockUiModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,8 +35,10 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
+import javax.inject.Inject
 
-class PriceTrackerViewModel(
+@HiltViewModel
+class PriceTrackerViewModel @Inject constructor(
     private val getInitialStocksUseCase: GetInitialStocksUseCase,
     private val getCachedStocksUseCase: GetCachedStocksUseCase,
     private val subscribeToPriceUpdatesUseCase: SubscribeToPriceUpdatesUseCase,

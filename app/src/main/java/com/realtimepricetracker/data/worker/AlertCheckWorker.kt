@@ -1,28 +1,29 @@
 package com.realtimepricetracker.data.worker
 
 import android.content.Context
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.google.gson.Gson
 import com.realtimepricetracker.data.datasource.FinnhubRestDataSource
 import com.realtimepricetracker.data.local.AlertDataSource
 import com.realtimepricetracker.data.notification.NotificationHelper
 import com.realtimepricetracker.domain.entities.AlertCondition
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
 
 // Runs periodically (every 15 min) to check alerts even when the app is closed.
 // Uses REST API since the WebSocket is not available in the background.
-class AlertCheckWorker(
-    appContext: Context,
-    params: WorkerParameters
+@HiltWorker
+class AlertCheckWorker @AssistedInject constructor(
+    @Assisted appContext: Context,
+    @Assisted params: WorkerParameters,
+    private val alertDataSource: AlertDataSource,
+    private val restDataSource: FinnhubRestDataSource,
+    private val notificationHelper: NotificationHelper
 ) : CoroutineWorker(appContext, params) {
 
     override suspend fun doWork(): Result {
-        val gson = Gson()
-        val alertDataSource = AlertDataSource(applicationContext, gson)
-        val restDataSource = FinnhubRestDataSource(gson = gson)
-        val notificationHelper = NotificationHelper(applicationContext)
-
         val active = alertDataSource.observeAlerts().first().filter { it.isActive }
         if (active.isEmpty()) return Result.success()
 

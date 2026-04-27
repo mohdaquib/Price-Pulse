@@ -6,26 +6,23 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.activity.viewModels
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.realtimepricetracker.data.notification.NotificationHelper
 import com.realtimepricetracker.data.worker.AlertCheckWorker
-import com.realtimepricetracker.di.AppFactory
 import com.realtimepricetracker.presentation.ui.PriceTrackerScreen
 import com.realtimepricetracker.presentation.viewmodel.PriceTrackerViewModel
-import com.realtimepricetracker.presentation.viewmodel.PriceTrackerViewModelFactory
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.concurrent.TimeUnit
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        AppFactory.init(applicationContext)
-
-        NotificationHelper(applicationContext).createChannel()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 0)
@@ -35,10 +32,7 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            val viewModel: PriceTrackerViewModel = viewModel(
-                factory = PriceTrackerViewModelFactory()
-            )
-            PriceTrackerScreen(viewModel = viewModel)
+            PriceTrackerScreen()
         }
     }
 

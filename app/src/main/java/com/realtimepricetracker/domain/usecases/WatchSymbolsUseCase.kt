@@ -1,14 +1,9 @@
 package com.realtimepricetracker.domain.usecases
 
 import com.realtimepricetracker.domain.repositories.PriceRepository
+import javax.inject.Inject
 
-/**
- * Use case for managing symbol subscriptions on the WebSocket.
- */
-class WatchSymbolsUseCase(private val priceRepository: PriceRepository) {
-    suspend fun subscribe(symbols: List<String>): Result<Unit> = 
-        priceRepository.subscribeToSymbols(symbols)
-
-    suspend fun unsubscribe(symbols: List<String>): Result<Unit> = 
-        priceRepository.unsubscribeFromSymbols(symbols)
+class WatchSymbolsUseCase @Inject constructor(private val priceRepository: PriceRepository) {
+    suspend fun subscribe(symbols: List<String>) = priceRepository.subscribeToSymbols(symbols)
+    suspend fun unsubscribe(symbols: List<String>) = priceRepository.unsubscribeFromSymbols(symbols)
 }

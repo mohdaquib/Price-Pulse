@@ -5,6 +5,7 @@ import com.realtimepricetracker.domain.entities.OrderBookEntry
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
 /**
  * Emits a refreshed mock [OrderBook] every 1.5 seconds centred on [referencePrice].
@@ -12,7 +13,7 @@ import kotlinx.coroutines.flow.flow
  * Mock data is used because real order-book streaming requires a Finnhub premium subscription.
  * The price levels and quantities fluctuate on each emission to simulate a live book.
  */
-class ObserveOrderBookUseCase {
+class ObserveOrderBookUseCase @Inject constructor() {
 
     operator fun invoke(symbol: String, referencePrice: Double): Flow<OrderBook> = flow {
         while (true) {

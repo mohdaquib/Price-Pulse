@@ -66,24 +66,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.realtimepricetracker.domain.entities.AlertCondition
 import com.realtimepricetracker.domain.entities.PriceAlert
 import com.realtimepricetracker.presentation.state.AppTab
 import com.realtimepricetracker.presentation.state.PriceTrackerUiState
 import com.realtimepricetracker.presentation.state.StockUiModel
 import com.realtimepricetracker.presentation.viewmodel.PriceTrackerViewModel
-import com.realtimepricetracker.ui.theme.AccentGold
-import com.realtimepricetracker.ui.theme.BullGreen
-import com.realtimepricetracker.ui.theme.BearRed
-import com.realtimepricetracker.ui.theme.RealtimePriceTrackerTheme
-import com.realtimepricetracker.ui.theme.SuccessGreen
-import com.realtimepricetracker.ui.theme.ErrorRed
-import com.realtimepricetracker.ui.theme.WarningOrange
+import com.realtimepricetracker.presentation.ui.theme.AccentGold
+import com.realtimepricetracker.presentation.ui.theme.BullGreen
+import com.realtimepricetracker.presentation.ui.theme.BearRed
+import com.realtimepricetracker.presentation.ui.theme.RealtimePriceTrackerTheme
+import com.realtimepricetracker.presentation.ui.theme.WarningOrange
 
 // ── Entry point ───────────────────────────────────────────────────────────────
-
 @Composable
-fun PriceTrackerScreen(viewModel: PriceTrackerViewModel) {
+fun PriceTrackerScreen(viewModel: PriceTrackerViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsState()
     RealtimePriceTrackerTheme(darkTheme = uiState.isDarkMode) {
         Scaffold(

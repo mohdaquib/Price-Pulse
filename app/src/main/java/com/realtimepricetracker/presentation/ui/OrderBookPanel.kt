@@ -28,9 +28,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.realtimepricetracker.domain.entities.OrderBook
 import com.realtimepricetracker.domain.entities.OrderBookEntry
-import com.realtimepricetracker.ui.theme.ErrorRed
-import com.realtimepricetracker.ui.theme.RealtimePriceTrackerTheme
-import com.realtimepricetracker.ui.theme.SuccessGreen
+import com.realtimepricetracker.presentation.ui.theme.ErrorRed
+import com.realtimepricetracker.presentation.ui.theme.RealtimePriceTrackerTheme
+import com.realtimepricetracker.presentation.ui.theme.SuccessGreen
 
 @Composable
 fun OrderBookPanel(
