@@ -20,15 +20,11 @@
 
 ## Demo
 
-> **To add your demo:** convert `app/src/main/res/raw/realtime_price_app_recording.mp4` to a GIF
-> with [ScreenToGif](https://www.screentogif.com/) and drop it in a `docs/` folder.
+<div align="center">
 
-```
-docs/
-└── demo.gif   ← replace this placeholder
-```
+![PricePulse demo](docs/demo.gif)
 
-<!-- ![PricePulse demo](docs/demo.gif) -->
+</div>
 
 ---
 
