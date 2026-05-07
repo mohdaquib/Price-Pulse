@@ -1,4 +1,4 @@
-package com.aquib.pricepulse.presentation.ui
+package com.aquib.pricepulse.feature.price.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -69,15 +69,15 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.aquib.pricepulse.domain.entities.AlertCondition
 import com.aquib.pricepulse.domain.entities.PriceAlert
-import com.aquib.pricepulse.presentation.state.AppTab
-import com.aquib.pricepulse.presentation.state.PriceTrackerUiState
-import com.aquib.pricepulse.presentation.state.StockUiModel
-import com.aquib.pricepulse.presentation.viewmodel.PriceTrackerViewModel
-import com.aquib.pricepulse.presentation.ui.theme.AccentGold
-import com.aquib.pricepulse.presentation.ui.theme.BullGreen
-import com.aquib.pricepulse.presentation.ui.theme.BearRed
-import com.aquib.pricepulse.presentation.ui.theme.PricePulseTheme
-import com.aquib.pricepulse.presentation.ui.theme.WarningOrange
+import com.aquib.pricepulse.feature.price.state.AppTab
+import com.aquib.pricepulse.feature.price.state.PriceTrackerUiState
+import com.aquib.pricepulse.feature.price.state.StockUiModel
+import com.aquib.pricepulse.feature.price.viewmodel.PriceTrackerViewModel
+import com.aquib.pricepulse.feature.price.ui.theme.AccentGold
+import com.aquib.pricepulse.feature.price.ui.theme.BullGreen
+import com.aquib.pricepulse.feature.price.ui.theme.BearRed
+import com.aquib.pricepulse.feature.price.ui.theme.PricePulseTheme
+import com.aquib.pricepulse.feature.price.ui.theme.WarningOrange
 
 // ── Entry point ───────────────────────────────────────────────────────────────
 @Composable
@@ -841,5 +841,3 @@ private fun WatchlistEmptyPreview() {
 private fun LoadingPreview() {
     PricePulseTheme { LoadingState() }
 }
-
-

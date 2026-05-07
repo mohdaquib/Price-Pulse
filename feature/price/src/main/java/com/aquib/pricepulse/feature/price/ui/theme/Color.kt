@@ -1,4 +1,4 @@
-package com.aquib.pricepulse.presentation.ui.theme
+package com.aquib.pricepulse.feature.price.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
@@ -36,4 +36,3 @@ val DarkBackground  = TradingBg
 val LightBackground = Color(0xFFFAFAFA)
 val DarkSurface     = TradingSurface
 val LightSurface    = Color(0xFFFFFFFF)
-

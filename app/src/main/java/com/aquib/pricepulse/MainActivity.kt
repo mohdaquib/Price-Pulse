@@ -17,7 +17,7 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.aquib.pricepulse.data.worker.AlertCheckWorker
-import com.aquib.pricepulse.presentation.ui.PriceTrackerScreen
+import com.aquib.pricepulse.feature.price.ui.PriceTrackerScreen
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.concurrent.TimeUnit
 

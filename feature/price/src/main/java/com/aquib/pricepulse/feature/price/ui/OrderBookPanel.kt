@@ -1,4 +1,4 @@
-package com.aquib.pricepulse.presentation.ui
+package com.aquib.pricepulse.feature.price.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -28,9 +28,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aquib.pricepulse.domain.entities.OrderBook
 import com.aquib.pricepulse.domain.entities.OrderBookEntry
-import com.aquib.pricepulse.presentation.ui.theme.ErrorRed
-import com.aquib.pricepulse.presentation.ui.theme.PricePulseTheme
-import com.aquib.pricepulse.presentation.ui.theme.SuccessGreen
+import com.aquib.pricepulse.feature.price.ui.theme.ErrorRed
+import com.aquib.pricepulse.feature.price.ui.theme.PricePulseTheme
+import com.aquib.pricepulse.feature.price.ui.theme.SuccessGreen
 
 @Composable
 fun OrderBookPanel(
@@ -290,5 +290,3 @@ private fun OrderBookPanelPreview() {
         OrderBookPanel(orderBook = book)
     }
 }
-
-

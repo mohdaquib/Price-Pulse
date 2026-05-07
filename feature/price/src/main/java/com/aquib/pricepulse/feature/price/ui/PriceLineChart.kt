@@ -1,4 +1,4 @@
-package com.aquib.pricepulse.presentation.ui
+package com.aquib.pricepulse.feature.price.ui
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
@@ -116,4 +116,3 @@ fun PriceLineChart(
         }
     }
 }
-

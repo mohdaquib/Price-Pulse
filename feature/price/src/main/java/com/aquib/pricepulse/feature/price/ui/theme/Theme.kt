@@ -1,4 +1,4 @@
-package com.aquib.pricepulse.presentation.ui.theme
+package com.aquib.pricepulse.feature.price.ui.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -58,4 +58,3 @@ fun PricePulseTheme(
         content = content,
     )
 }
-

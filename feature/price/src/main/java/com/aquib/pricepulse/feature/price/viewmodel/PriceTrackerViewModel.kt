@@ -1,4 +1,4 @@
-package com.aquib.pricepulse.presentation.viewmodel
+package com.aquib.pricepulse.feature.price.viewmodel
 
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
@@ -21,9 +21,9 @@ import com.aquib.pricepulse.domain.usecases.RemoveAlertUseCase
 import com.aquib.pricepulse.domain.usecases.RemoveFromWatchlistUseCase
 import com.aquib.pricepulse.domain.usecases.SubscribeToPriceUpdatesUseCase
 import com.aquib.pricepulse.domain.usecases.WatchSymbolsUseCase
-import com.aquib.pricepulse.presentation.state.AppTab
-import com.aquib.pricepulse.presentation.state.PriceTrackerUiState
-import com.aquib.pricepulse.presentation.state.StockUiModel
+import com.aquib.pricepulse.feature.price.state.AppTab
+import com.aquib.pricepulse.feature.price.state.PriceTrackerUiState
+import com.aquib.pricepulse.feature.price.state.StockUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -292,4 +292,3 @@ class PriceTrackerViewModel @Inject constructor(
         priceHistory = priceHistories[symbol]?.toList() ?: emptyList()
     )
 }
-

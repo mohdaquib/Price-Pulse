@@ -43,8 +43,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":domain"))
     implementation(project(":data"))
+    implementation(project(":feature:price"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.core.splashscreen)
@@ -52,18 +52,12 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
-    implementation(libs.compose.material.icons.extended)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
 
     implementation(libs.work.runtime.ktx)
 
     // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
-    implementation(libs.hilt.navigation.compose)
     implementation(libs.androidx.hilt.work)
     ksp(libs.androidx.hilt.compiler)
 

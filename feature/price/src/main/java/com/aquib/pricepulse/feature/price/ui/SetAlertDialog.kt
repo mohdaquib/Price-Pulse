@@ -1,4 +1,4 @@
-package com.aquib.pricepulse.presentation.ui
+package com.aquib.pricepulse.feature.price.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,10 +26,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aquib.pricepulse.domain.entities.AlertCondition
-import com.aquib.pricepulse.presentation.ui.theme.AccentGold
-import com.aquib.pricepulse.presentation.ui.theme.BullGreen
-import com.aquib.pricepulse.presentation.ui.theme.BearRed
-import com.aquib.pricepulse.presentation.ui.theme.PricePulseTheme
+import com.aquib.pricepulse.feature.price.ui.theme.AccentGold
+import com.aquib.pricepulse.feature.price.ui.theme.BullGreen
+import com.aquib.pricepulse.feature.price.ui.theme.BearRed
+import com.aquib.pricepulse.feature.price.ui.theme.PricePulseTheme
 
 @Composable
 fun SetAlertDialog(
@@ -159,5 +159,3 @@ private fun SetAlertDialogPreview() {
         )
     }
 }
-
-

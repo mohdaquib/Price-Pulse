@@ -1,4 +1,4 @@
-﻿package com.aquib.pricepulse.presentation.state
+package com.aquib.pricepulse.feature.price.state
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
@@ -34,4 +34,3 @@ data class PriceTrackerUiState(
     val cacheTimestamp: Long? = null,
     val orderBook: OrderBook? = null,
 )
-
