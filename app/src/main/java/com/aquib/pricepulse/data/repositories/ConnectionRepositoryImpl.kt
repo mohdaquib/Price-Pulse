@@ -1,6 +1,6 @@
 ﻿package com.aquib.pricepulse.data.repositories
 
-import com.aquib.pricepulse.data.datasource.WebSocketDataSource
+import com.aquib.pricepulse.core.network.datasource.WebSocketDataSource
 import com.aquib.pricepulse.domain.repositories.ConnectionRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

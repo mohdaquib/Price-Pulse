@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.aquib.pricepulse.data.datasource.FinnhubRestDataSource
+import com.aquib.pricepulse.core.network.datasource.FinnhubRestDataSource
 import com.aquib.pricepulse.data.local.AlertDataSource
 import com.aquib.pricepulse.data.notification.NotificationHelper
 import com.aquib.pricepulse.domain.entities.AlertCondition

@@ -1,8 +1,8 @@
 ﻿package com.aquib.pricepulse.data.repositories
 
-import com.aquib.pricepulse.data.datasource.FinnhubRestDataSource
-import com.aquib.pricepulse.data.datasource.WebSocketDataSource
-import com.aquib.pricepulse.data.dto.FinnhubTradeDto
+import com.aquib.pricepulse.core.network.datasource.FinnhubRestDataSource
+import com.aquib.pricepulse.core.network.datasource.WebSocketDataSource
+import com.aquib.pricepulse.core.network.dto.FinnhubTradeDto
 import com.aquib.pricepulse.data.local.StockCacheDataSource
 import com.aquib.pricepulse.domain.entities.Stock
 import com.aquib.pricepulse.domain.repositories.PriceRepository

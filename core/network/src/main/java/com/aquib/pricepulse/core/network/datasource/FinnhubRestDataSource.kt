@@ -1,8 +1,8 @@
-﻿package com.aquib.pricepulse.data.datasource
+package com.aquib.pricepulse.core.network.datasource
 
 import com.google.gson.Gson
-import com.aquib.pricepulse.data.config.DataConstants
-import com.aquib.pricepulse.data.dto.FinnhubQuoteResponseDto
+import com.aquib.pricepulse.core.network.config.NetworkConstants
+import com.aquib.pricepulse.core.network.dto.FinnhubQuoteResponseDto
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -20,7 +20,7 @@ class FinnhubRestDataSource @Inject constructor(
             try {
                 val results = symbols.map { symbol ->
                     val request = Request.Builder()
-                        .url("${DataConstants.BASE_URL}/quote?symbol=$symbol&token=${DataConstants.API_KEY}")
+                        .url("${NetworkConstants.BASE_URL}/quote?symbol=$symbol&token=${NetworkConstants.API_KEY}")
                         .build()
 
                     client.newCall(request).execute().use { response ->
@@ -35,4 +35,3 @@ class FinnhubRestDataSource @Inject constructor(
             }
         }
 }
-

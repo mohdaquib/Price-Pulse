@@ -1,9 +1,9 @@
 package com.aquib.pricepulse.data.repositories
 
 import com.google.gson.Gson
-import com.aquib.pricepulse.data.datasource.FinnhubRestDataSource
-import com.aquib.pricepulse.data.datasource.WebSocketDataSource
-import com.aquib.pricepulse.data.dto.FinnhubQuoteResponseDto
+import com.aquib.pricepulse.core.network.datasource.FinnhubRestDataSource
+import com.aquib.pricepulse.core.network.datasource.WebSocketDataSource
+import com.aquib.pricepulse.core.network.dto.FinnhubQuoteResponseDto
 import com.aquib.pricepulse.data.local.StockCacheDataSource
 import com.aquib.pricepulse.domain.entities.Stock
 import io.mockk.coEvery

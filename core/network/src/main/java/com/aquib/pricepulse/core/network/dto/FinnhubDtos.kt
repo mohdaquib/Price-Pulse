@@ -1,10 +1,7 @@
-﻿package com.aquib.pricepulse.data.dto
+package com.aquib.pricepulse.core.network.dto
 
 import com.google.gson.annotations.SerializedName
 
-/**
- * DTO for Finnhub WebSocket trade data.
- */
 data class FinnhubTradeDto(
     @SerializedName("data") val data: List<TradeData> = emptyList(),
     @SerializedName("type") val type: String = ""
@@ -17,9 +14,6 @@ data class TradeData(
     @SerializedName("v") val volume: Double
 )
 
-/**
- * DTO for Finnhub REST quote response.
- */
 data class FinnhubQuoteResponseDto(
     @SerializedName("c") val currentPrice: Double,
     @SerializedName("d") val change: Double,
@@ -30,4 +24,3 @@ data class FinnhubQuoteResponseDto(
     @SerializedName("pc") val previousClose: Double,
     @SerializedName("t") val timestamp: Long
 )
-

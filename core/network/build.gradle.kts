@@ -32,4 +32,5 @@ dependencies {
     implementation(libs.okhttp.core)
     implementation(libs.okhttp.logging)
     implementation(libs.gson)
+    implementation(libs.kotlinx.coroutines.core)
 }
