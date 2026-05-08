@@ -2,6 +2,7 @@ package com.aquib.pricepulse.feature.price.state
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
+import com.aquib.pricepulse.core.common.ui.BaseUiState
 import com.aquib.pricepulse.domain.entities.OrderBook
 import com.aquib.pricepulse.domain.entities.PriceAlert
 
@@ -25,12 +26,12 @@ data class PriceTrackerUiState(
     val isConnected: Boolean = false,
     val isRunning: Boolean = false,
     val isDarkMode: Boolean = true,
-    val loading: Boolean = false,
-    val error: String? = null,
+    override val loading: Boolean = false,
+    override val error: String? = null,
     val selectedSymbol: String? = null,
     val alerts: List<PriceAlert> = emptyList(),
     val showAlertDialogForSymbol: String? = null,
     val isOffline: Boolean = false,
     val cacheTimestamp: Long? = null,
     val orderBook: OrderBook? = null,
-)
+) : BaseUiState

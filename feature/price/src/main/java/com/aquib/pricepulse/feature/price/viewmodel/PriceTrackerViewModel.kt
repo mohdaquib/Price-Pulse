@@ -3,8 +3,8 @@ package com.aquib.pricepulse.feature.price.viewmodel
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aquib.pricepulse.core.common.config.AppConstants
 import com.aquib.pricepulse.data.notification.NotificationHelper
-import com.aquib.pricepulse.domain.config.DomainConstants
 import com.aquib.pricepulse.domain.entities.AlertCondition
 import com.aquib.pricepulse.domain.entities.PriceAlert
 import com.aquib.pricepulse.domain.entities.Stock
@@ -81,7 +81,7 @@ class PriceTrackerViewModel @Inject constructor(
             .onEach { connected ->
                 _uiState.update { it.copy(isConnected = connected) }
                 if (connected && _uiState.value.isRunning) {
-                    watchSymbolsUseCase.subscribe(DomainConstants.STOCK_SYMBOLS)
+                    watchSymbolsUseCase.subscribe(AppConstants.STOCK_SYMBOLS)
                 }
             }
             .launchIn(viewModelScope)
@@ -117,7 +117,7 @@ class PriceTrackerViewModel @Inject constructor(
             }
 
             // Phase 2: fetch fresh data from REST — replaces cache on success
-            val result = getInitialStocksUseCase()
+            val result = getInitialStocksUseCase(AppConstants.STOCK_SYMBOLS)
             result.onSuccess { stocks ->
                 if (stocks.isNotEmpty()) {
                     stocks.forEach { stock ->
@@ -159,14 +159,14 @@ class PriceTrackerViewModel @Inject constructor(
         _uiState.update { it.copy(isRunning = true, error = null) }
         viewModelScope.launch {
             manageConnectionUseCase.connect()
-            watchSymbolsUseCase.subscribe(DomainConstants.STOCK_SYMBOLS)
+            watchSymbolsUseCase.subscribe(AppConstants.STOCK_SYMBOLS)
         }
     }
 
     private fun stopFeed() {
         _uiState.update { it.copy(isRunning = false) }
         viewModelScope.launch {
-            watchSymbolsUseCase.unsubscribe(DomainConstants.STOCK_SYMBOLS)
+            watchSymbolsUseCase.unsubscribe(AppConstants.STOCK_SYMBOLS)
             manageConnectionUseCase.disconnect()
         }
     }

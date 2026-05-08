@@ -2,7 +2,8 @@ package com.aquib.pricepulse.core.network.di
 
 import android.content.Context
 import com.google.gson.Gson
-import com.aquib.pricepulse.core.network.datasource.FinnhubRestDataSource
+import com.aquib.pricepulse.core.common.util.DefaultDispatcherProvider
+import com.aquib.pricepulse.core.common.util.DispatcherProvider
 import com.aquib.pricepulse.core.network.datasource.WebSocketDataSource
 import dagger.Module
 import dagger.Provides
@@ -18,6 +19,10 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
+
+    @Provides
+    @Singleton
+    fun provideDispatcherProvider(): DispatcherProvider = DefaultDispatcherProvider()
 
     @Provides
     @Singleton
@@ -42,10 +47,4 @@ object NetworkModule {
         scope: CoroutineScope
     ): WebSocketDataSource = WebSocketDataSource(scope, context)
 
-    @Provides
-    @Singleton
-    fun provideFinnhubRestDataSource(
-        client: OkHttpClient,
-        gson: Gson
-    ): FinnhubRestDataSource = FinnhubRestDataSource(client, gson)
 }
