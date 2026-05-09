@@ -1,0 +1,166 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# PricePulse — Android CI/CD Pipeline
+# Triggers : push → main/master | every pull_request
+# Jobs     : build (APK) · test (unit + coverage) · lint  [all parallel]
+# ──────────────────────────────────────────────────────────────────────────────
+name: Android CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+# Cancel any in-flight run for the same branch/PR when a new commit arrives.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  JAVA_VERSION: '17'
+  JAVA_DIST: 'temurin'
+
+# ─────────────────────────────── JOBS ────────────────────────────────────────
+
+jobs:
+
+  # ┌─────────────────────────────────────────────────────────────────────────┐
+  # │  BUILD — compiles every module and produces a debug APK                 │
+  # └─────────────────────────────────────────────────────────────────────────┘
+  build:
+    name: Build Debug APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      # Temurin 17 — matches compileOptions / kotlinOptions in all modules
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DIST }}
+
+      # gradle/actions handles ~/.gradle/caches, ~/.gradle/wrapper and the
+      # project-level .gradle/configuration-cache automatically.
+      # Write to the shared cache only on main/master; PRs read-only so they
+      # cannot pollute the canonical cache entry.
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' }}
+
+      # The runner has the Android SDK pre-installed; AGP needs sdk.dir or
+      # ANDROID_HOME. We write local.properties so the wrapper can find it
+      # even if ANDROID_HOME is not propagated into the Gradle daemon.
+      - name: Write local.properties
+        run: echo "sdk.dir=$ANDROID_HOME" >> local.properties
+
+      - name: Clean & assemble debug APK
+        run: ./gradlew clean assembleDebug --stacktrace
+
+      # Artifact name includes run number so multiple runs are distinguishable
+      # in the Actions UI without overwriting each other.
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-apk-${{ github.run_number }}
+          path: app/build/outputs/apk/debug/*.apk
+          retention-days: 14
+
+  # ┌─────────────────────────────────────────────────────────────────────────┐
+  # │  TEST — runs unit tests for every module + Jacoco coverage report       │
+  # └─────────────────────────────────────────────────────────────────────────┘
+  test:
+    name: Unit Tests & Coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DIST }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' }}
+
+      - name: Write local.properties
+        run: echo "sdk.dir=$ANDROID_HOME" >> local.properties
+
+      # --continue keeps going if one module's tests fail so all reports are
+      # collected in a single run rather than stopping at the first failure.
+      - name: Run unit tests
+        run: ./gradlew testDebugUnitTest --continue
+
+      # Requires enableUnitTestCoverage = true in the debug buildType (see
+      # Gradle changes section). --continue prevents a missing task in a module
+      # without coverage enabled from failing the whole step.
+      - name: Generate Jacoco coverage report
+        if: success() || failure()
+        run: ./gradlew createDebugUnitTestCoverageReport --continue
+
+      - name: Upload test & coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-coverage-reports-${{ github.run_number }}
+          path: |
+            **/build/reports/tests/
+            **/build/reports/coverage/tests/
+          retention-days: 14
+
+  # ┌─────────────────────────────────────────────────────────────────────────┐
+  # │  LINT — static analysis across all modules; fails on any error          │
+  # └─────────────────────────────────────────────────────────────────────────┘
+  lint:
+    name: Lint Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DIST }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' }}
+
+      - name: Write local.properties
+        run: echo "sdk.dir=$ANDROID_HOME" >> local.properties
+
+      # AGP's lint task already has abortOnError = true by default, so any
+      # lint error exits non-zero and fails this job / the PR status check.
+      - name: Run lint
+        run: ./gradlew lint
+
+      # Upload even on failure so the HTML report is always downloadable for
+      # investigating which rule triggered the error.
+      - name: Upload lint reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lint-reports-${{ github.run_number }}
+          path: '**/build/reports/lint-results*.html'
+          retention-days: 14
