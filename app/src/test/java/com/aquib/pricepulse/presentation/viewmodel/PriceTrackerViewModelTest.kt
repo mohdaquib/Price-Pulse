@@ -3,10 +3,10 @@ package com.aquib.pricepulse.presentation.viewmodel
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.compose.ui.graphics.Color
 import com.aquib.pricepulse.MainDispatcherRule
-import com.aquib.pricepulse.data.notification.NotificationHelper
 import com.aquib.pricepulse.domain.entities.AlertCondition
 import com.aquib.pricepulse.domain.entities.PriceAlert
 import com.aquib.pricepulse.domain.entities.Stock
+import com.aquib.pricepulse.domain.repositories.Notifier
 import com.aquib.pricepulse.domain.usecases.AddAlertUseCase
 import com.aquib.pricepulse.domain.usecases.AddToWatchlistUseCase
 import com.aquib.pricepulse.domain.usecases.CheckAlertsUseCase
@@ -20,7 +20,8 @@ import com.aquib.pricepulse.domain.usecases.RemoveAlertUseCase
 import com.aquib.pricepulse.domain.usecases.RemoveFromWatchlistUseCase
 import com.aquib.pricepulse.domain.usecases.SubscribeToPriceUpdatesUseCase
 import com.aquib.pricepulse.domain.usecases.WatchSymbolsUseCase
-import com.aquib.pricepulse.presentation.state.AppTab
+import com.aquib.pricepulse.feature.price.state.AppTab
+import com.aquib.pricepulse.feature.price.viewmodel.PriceTrackerViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -61,7 +62,7 @@ class PriceTrackerViewModelTest {
     private lateinit var addAlertUseCase: AddAlertUseCase
     private lateinit var removeAlertUseCase: RemoveAlertUseCase
     private lateinit var checkAlertsUseCase: CheckAlertsUseCase
-    private lateinit var notificationHelper: NotificationHelper
+    private lateinit var notifier: Notifier
     private lateinit var observeOrderBookUseCase: ObserveOrderBookUseCase
 
     // Controllable flows shared across tests
@@ -84,14 +85,14 @@ class PriceTrackerViewModelTest {
         addAlertUseCase = mockk(relaxed = true)
         removeAlertUseCase = mockk(relaxed = true)
         checkAlertsUseCase = mockk(relaxed = true)
-        notificationHelper = mockk(relaxed = true)
+        notifier = mockk(relaxed = true)
         observeOrderBookUseCase = mockk(relaxed = true)
 
         // Default stubs used by every test unless overridden
         coEvery { getCachedStocksUseCase() } returns Pair(emptyList(), null)
-        coEvery { getInitialStocksUseCase() } returns Result.success(emptyList())
+        coEvery { getInitialStocksUseCase(any()) } returns Result.success(emptyList())
         every { subscribeToPriceUpdatesUseCase() } returns priceUpdatesFlow
-        every { manageConnectionUseCase.observeConnectionState() } returns connectionStateFlow
+        every { manageConnectionUseCase.connectionState } returns connectionStateFlow
         every { observeWatchlistUseCase() } returns watchlistFlow
         every { observeAlertsUseCase() } returns alertsFlow
         every { checkAlertsUseCase(any(), any(), any()) } returns emptyList()
@@ -111,7 +112,7 @@ class PriceTrackerViewModelTest {
         addAlertUseCase = addAlertUseCase,
         removeAlertUseCase = removeAlertUseCase,
         checkAlertsUseCase = checkAlertsUseCase,
-        notificationHelper = notificationHelper,
+        notifier = notifier,
         observeOrderBookUseCase = observeOrderBookUseCase,
     )
 
@@ -119,7 +120,7 @@ class PriceTrackerViewModelTest {
 
     @Test
     fun `shows loading when no cache and REST is in flight`() = runTest {
-        coEvery { getInitialStocksUseCase() } coAnswers {
+        coEvery { getInitialStocksUseCase(any()) } coAnswers {
             delay(10_000)
             Result.success(emptyList())
         }
@@ -131,9 +132,9 @@ class PriceTrackerViewModelTest {
 
     @Test
     fun `shows cached stocks as offline before REST returns`() = runTest {
-        val cached = listOf(Stock("AAPL", 150.0, 0.0), Stock("GOOG", 100.0, 0.0))
+        val cached = listOf(Stock("AAPL", 150.0, 0.0))
         coEvery { getCachedStocksUseCase() } returns Pair(cached, 1_700_000_000L)
-        coEvery { getInitialStocksUseCase() } coAnswers {
+        coEvery { getInitialStocksUseCase(any()) } coAnswers {
             delay(10_000)
             Result.success(emptyList())
         }
@@ -141,7 +142,7 @@ class PriceTrackerViewModelTest {
         val vm = createViewModel()
 
         assertTrue(vm.uiState.value.isOffline)
-        assertEquals(2, vm.uiState.value.stocks.size)
+        assertEquals(1, vm.uiState.value.stocks.size)
         assertEquals(1_700_000_000L, vm.uiState.value.cacheTimestamp)
     }
 
@@ -150,7 +151,7 @@ class PriceTrackerViewModelTest {
         val cached = listOf(Stock("AAPL", 150.0, 0.0))
         val fresh = listOf(Stock("AAPL", 160.0, 10.0), Stock("GOOG", 100.0, 2.0))
         coEvery { getCachedStocksUseCase() } returns Pair(cached, 1_700_000_000L)
-        coEvery { getInitialStocksUseCase() } returns Result.success(fresh)
+        coEvery { getInitialStocksUseCase(any()) } returns Result.success(fresh)
 
         val vm = createViewModel()
         advanceUntilIdle()
@@ -164,7 +165,7 @@ class PriceTrackerViewModelTest {
     fun `REST failure with cached stocks does not show error`() = runTest {
         val cached = listOf(Stock("AAPL", 150.0, 0.0))
         coEvery { getCachedStocksUseCase() } returns Pair(cached, null)
-        coEvery { getInitialStocksUseCase() } returns Result.failure(RuntimeException("offline"))
+        coEvery { getInitialStocksUseCase(any()) } returns Result.failure(RuntimeException("offline"))
 
         val vm = createViewModel()
         advanceUntilIdle()
@@ -174,7 +175,7 @@ class PriceTrackerViewModelTest {
 
     @Test
     fun `REST failure without cache shows error message`() = runTest {
-        coEvery { getInitialStocksUseCase() } returns Result.failure(RuntimeException("no network"))
+        coEvery { getInitialStocksUseCase(any()) } returns Result.failure(RuntimeException("no network"))
 
         val vm = createViewModel()
         advanceUntilIdle()
@@ -210,7 +211,7 @@ class PriceTrackerViewModelTest {
 
     @Test
     fun `price update with positive change sets green flash and updates stock`() = runTest {
-        coEvery { getInitialStocksUseCase() } returns Result.success(
+        coEvery { getInitialStocksUseCase(any()) } returns Result.success(
             listOf(Stock("AAPL", 150.0, 0.0))
         )
         val vm = createViewModel()
@@ -221,12 +222,12 @@ class PriceTrackerViewModelTest {
         val stock = vm.uiState.value.stocks.find { it.symbol == "AAPL" }
         assertNotNull(stock)
         assertEquals(160.0, stock!!.price, 0.001)
-        assertEquals(Color.Green, stock.flashColor)
+        assertTrue(stock.flashColor == Color.Green)
     }
 
     @Test
     fun `price update with negative change sets red flash`() = runTest {
-        coEvery { getInitialStocksUseCase() } returns Result.success(
+        coEvery { getInitialStocksUseCase(any()) } returns Result.success(
             listOf(Stock("AAPL", 150.0, 0.0))
         )
         val vm = createViewModel()
@@ -235,12 +236,12 @@ class PriceTrackerViewModelTest {
         priceUpdatesFlow.emit(Result.success(Stock("AAPL", 140.0, -10.0)))
 
         val stock = vm.uiState.value.stocks.find { it.symbol == "AAPL" }
-        assertEquals(Color.Red, stock!!.flashColor)
+        assertTrue(stock!!.flashColor == Color.Red)
     }
 
     @Test
     fun `flash color clears after 500ms`() = runTest {
-        coEvery { getInitialStocksUseCase() } returns Result.success(
+        coEvery { getInitialStocksUseCase(any()) } returns Result.success(
             listOf(Stock("AAPL", 150.0, 0.0))
         )
         val vm = createViewModel()
@@ -261,18 +262,18 @@ class PriceTrackerViewModelTest {
         val alert = PriceAlert(id = "a1", symbol = "AAPL", targetPrice = 200.0, condition = AlertCondition.ABOVE)
         alertsFlow.value = listOf(alert)
 
-        coEvery { getInitialStocksUseCase() } returns Result.success(
+        coEvery { getInitialStocksUseCase(any()) } returns Result.success(
             listOf(Stock("AAPL", 150.0, 0.0))
         )
         every { checkAlertsUseCase(any(), eq("AAPL"), eq(205.0)) } returns listOf(alert)
 
-        val vm = createViewModel()
+        createViewModel()
         advanceUntilIdle()
 
         priceUpdatesFlow.emit(Result.success(Stock("AAPL", 205.0, 55.0)))
         advanceUntilIdle()
 
-        verify { notificationHelper.notify(alert, 205.0) }
+        verify { notifier.notify(alert, 205.0) }
         coVerify { removeAlertUseCase("a1") }
     }
 
@@ -324,7 +325,7 @@ class PriceTrackerViewModelTest {
 
     @Test
     fun `selectStock updates selectedSymbol and starts order book`() = runTest {
-        coEvery { getInitialStocksUseCase() } returns Result.success(
+        coEvery { getInitialStocksUseCase(any()) } returns Result.success(
             listOf(Stock("AAPL", 150.0, 0.0))
         )
         val vm = createViewModel()
@@ -356,7 +357,7 @@ class PriceTrackerViewModelTest {
 
     @Test
     fun `clearError sets error to null`() = runTest {
-        coEvery { getInitialStocksUseCase() } returns Result.failure(RuntimeException("boom"))
+        coEvery { getInitialStocksUseCase(any()) } returns Result.failure(RuntimeException("boom"))
         val vm = createViewModel()
         advanceUntilIdle()
 
@@ -376,4 +377,3 @@ class PriceTrackerViewModelTest {
         assertFalse(vm.uiState.value.isDarkMode)
     }
 }
-

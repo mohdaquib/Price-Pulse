@@ -1,6 +1,11 @@
 package com.aquib.pricepulse.data.worker
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.core.content.ContextCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -12,8 +17,10 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
 
-// Runs periodically (every 15 min) to check alerts even when the app is closed.
-// Uses REST API since the WebSocket is not available in the background.
+/**
+ * Runs periodically (every 15 min) to check alerts even when the app is closed.
+ * Uses REST API since the WebSocket is not available in the background.
+ */
 @HiltWorker
 class AlertCheckWorker @AssistedInject constructor(
     @Assisted appContext: Context,
@@ -23,6 +30,7 @@ class AlertCheckWorker @AssistedInject constructor(
     private val notificationHelper: NotificationHelper
 ) : CoroutineWorker(appContext, params) {
 
+    @SuppressLint("MissingPermission")
     override suspend fun doWork(): Result {
         val active = alertDataSource.observeAlerts().first().filter { it.isActive }
         if (active.isEmpty()) return Result.success()
@@ -38,7 +46,20 @@ class AlertCheckWorker @AssistedInject constructor(
                 AlertCondition.BELOW -> price <= alert.targetPrice
             }
             if (triggered) {
-                notificationHelper.notify(alert, price)
+                // Check notification permission for Android 13+ (API 33)
+                val hasPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    ContextCompat.checkSelfPermission(
+                        applicationContext,
+                        Manifest.permission.POST_NOTIFICATIONS
+                    ) == PackageManager.PERMISSION_GRANTED
+                } else {
+                    true
+                }
+
+                if (hasPermission) {
+                    notificationHelper.notify(alert, price)
+                }
+
                 alertDataSource.remove(alert.id)
             }
         }

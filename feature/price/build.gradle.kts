@@ -28,8 +28,12 @@ android {
 }
 
 dependencies {
-    implementation(project(":domain"))
-    implementation(project(":core:common"))
+    api(project(":domain"))
+    api(project(":core:common"))
+    
+    // api is used here because StockUiModel exposes Color in its public properties
+    api(libs.androidx.ui)
+    api(libs.androidx.ui.graphics)
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
