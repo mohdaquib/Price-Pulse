@@ -21,3 +21,8 @@ dependencyResolutionManagement {
 
 rootProject.name = "PricePulse"
 include(":app")
+include(":core:common")
+include(":core:network")
+include(":domain")
+include(":data")
+include(":feature:price")
