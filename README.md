@@ -11,6 +11,7 @@
 [![Compose](https://img.shields.io/badge/Jetpack%20Compose-BOM%202025-4285F4)](https://developer.android.com/jetpack/compose)
 [![Architecture](https://img.shields.io/badge/Clean%20Architecture-MVVM-F0B90B)](https://developer.android.com/topic/architecture)
 [![License](https://img.shields.io/badge/License-MIT-02C076)](LICENSE)
+[![CI](https://github.com/mohd-aquib/Realtime-Price-Tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/mohd-aquib/Realtime-Price-Tracker/actions/workflows/ci.yml)
 
 *Live prices · Animated charts · Price alerts · Order book · Watchlist · Offline support*
 
@@ -156,6 +157,25 @@ PriceTrackerViewModel
 
 ---
 
+## 🧩 Modularization
+
+Multi-module Gradle architecture for scalability, maintainability, and clean separation of concerns.
+
+| Module | Responsibility |
+|--------|----------------|
+| `:app` | Entry point and navigation |
+| `:core:network` | WebSocket + networking setup |
+| `:core:common` | Shared utilities |
+| `:domain` | Business logic, use cases, and repository interfaces |
+| `:data` | Repository implementations and data sources |
+| `:feature:price` | UI screens and ViewModel |
+
+- **Independent feature development** — each module compiles and tests in isolation
+- **Faster builds** — Gradle only recompiles changed modules
+- **Better testability** — minimal surface area per module
+
+---
+
 ## Tech stack
 
 | Layer | Library / Tool | Version |
@@ -170,6 +190,17 @@ PriceTrackerViewModel
 | Background work | WorkManager | 2.10 |
 | Splash screen | AndroidX Core SplashScreen | 1.0 |
 | Build | Gradle KTS + Version Catalog | AGP 9.1 |
+
+---
+
+## 🚀 CI/CD
+
+Runs on every push and pull request to `main` via [GitHub Actions](https://github.com/mohd-aquib/Realtime-Price-Tracker/actions/workflows/ci.yml).
+
+- **Build** — `./gradlew assembleDebug`
+- **Unit tests** — `./gradlew test` across all modules
+- **Lint** — `./gradlew lint`
+- **APK artifact** — debug APK uploaded as a workflow artifact
 
 ---
 
