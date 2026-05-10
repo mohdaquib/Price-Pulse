@@ -11,7 +11,7 @@
 [![Compose](https://img.shields.io/badge/Jetpack%20Compose-BOM%202025-4285F4)](https://developer.android.com/jetpack/compose)
 [![Architecture](https://img.shields.io/badge/Clean%20Architecture-MVVM-F0B90B)](https://developer.android.com/topic/architecture)
 [![License](https://img.shields.io/badge/License-MIT-02C076)](LICENSE)
-[![CI](https://github.com/mohd-aquib/Realtime-Price-Tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/mohd-aquib/Realtime-Price-Tracker/actions/workflows/ci.yml)
+[![CI](https://github.com/mohd-aquib/Realtime-Price-Tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/mohdaquib/Price-Pulse/actions/workflows/android-ci.yml)
 
 *Live prices · Animated charts · Price alerts · Order book · Watchlist · Offline support*
 
