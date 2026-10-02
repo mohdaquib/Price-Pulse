@@ -9,7 +9,6 @@ import com.aquib.pricepulse.core.network.config.NetworkConstants
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -53,13 +52,8 @@ class WebSocketDataSource(
     private val _connectionState = MutableStateFlow(false)
     val connectionState: StateFlow<Boolean> = _connectionState
 
-    // replay = 0: live events, not state — late collectors must not receive stale trades.
-    // extraBufferCapacity = 64: lets the OkHttp thread emit without suspending.
-    private val _receivedMessages = MutableSharedFlow<String>(
-        replay = 0,
-        extraBufferCapacity = 64
-    )
-    val receivedMessages: SharedFlow<String> = _receivedMessages
+    private val messageBuffer = WebSocketMessageBuffer()
+    val receivedMessages: SharedFlow<String> = messageBuffer.messages
 
     init {
         registerNetworkCallback()
@@ -116,7 +110,7 @@ class WebSocketDataSource(
             }
 
             override fun onMessage(webSocket: WebSocket, text: String) {
-                scope.launch { _receivedMessages.emit(text) }
+                messageBuffer.offer(text)
             }
 
             override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
