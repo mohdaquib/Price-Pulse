@@ -33,5 +33,5 @@ dependencies {
     implementation(libs.okhttp.core)
     implementation(libs.gson)
     implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.bundles.testing.unit)
+    testImplementation(libs.bundles.testing.unit)
 }
